@@ -1,8 +1,11 @@
-clase 16/
-├── apis.py              
-├── models/
-│   └── persona.py
-├── repository/
-│   └── persona_repository.py
-└── services/
-    └── persona_service.py
+```mermaid
+flowchart TD
+    Usuario --> API
+    API --> Service
+    Service --> Repository
+    Repository --> Model
+    Model --> Repository
+    Repository --> Service
+    Service --> API
+    API --> Usuario
+```
