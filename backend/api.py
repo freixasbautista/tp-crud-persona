@@ -46,6 +46,7 @@ def crear_app(servicio=None):
         return jsonify(resultado), 200
 
     @app.get("/personas/<int:dni>")
+    @app.get("/persona/<int:dni>")
     def obtener_persona(dni):
         persona = servicio.obtener_persona_por_dni(dni)
 
@@ -74,6 +75,7 @@ def crear_app(servicio=None):
 
         return jsonify(persona_a_diccionario(persona)), 201
 
+    @app.put("/persona/<int:dni>")
     @app.put("/personas/<int:dni>")
     def modificar_persona(dni):
         datos = request.get_json(silent=True)
@@ -81,19 +83,23 @@ def crear_app(servicio=None):
         if not isinstance(datos, dict):
             return jsonify({"error": "Se requiere un objeto JSON"}), 400
 
-        if "dni" not in datos or "nombre" not in datos:
+        if "nombre" not in datos:
             return jsonify({
-                "error": "Los campos dni y nombre son obligatorios"
+                "error": "El campo nombre es obligatorio"
             }), 400
 
         try:
-            persona = Persona(datos["dni"], datos["nombre"])
+            persona = Persona(dni, datos["nombre"])
             servicio.modificar_persona(dni, persona)
         except (TypeError, ValueError) as error:
+            if "No existe" in str(error):
+                return jsonify({"error": str(error)}), 404
+
             return jsonify({"error": str(error)}), 400
 
         return jsonify(persona_a_diccionario(persona)), 200
 
+    @app.delete("/persona/<int:dni>")
     @app.delete("/personas/<int:dni>")
     def eliminar_persona(dni):
         persona = servicio.obtener_persona_por_dni(dni)
