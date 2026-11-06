@@ -1,3 +1,4 @@
+
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
@@ -19,25 +20,25 @@ def personas_a_lista_diccionarios(personas):
 
 
 def crear_app(servicio=None):
-    """Crea la aplicación Flask y configura sus rutas."""
     app = Flask(__name__)
     CORS(app)
 
     if servicio is None:
         servicio = PersonaService()
 
-        personas_iniciales = [
-            Persona(12345678, "Bautista"),
-            Persona(87654321, "Carlos"),
-            Persona(23456789, "Lucia"),
-            Persona(34567890, "Mateo"),
-            Persona(45678901, "Sofia"),
-            Persona(56789012, "Valentina"),
-            Persona(67890123, "Nicolas"),
-        ]
+        if not servicio.obtener_personas():
+            personas_iniciales = [
+                Persona(12345678, "Bautista"),
+                Persona(87654321, "Carlos"),
+                Persona(23456789, "Lucia"),
+                Persona(34567890, "Mateo"),
+                Persona(45678901, "Sofia"),
+                Persona(56789012, "Valentina"),
+                Persona(67890123, "Nicolas"),
+            ]
 
-        for persona in personas_iniciales:
-            servicio.agregar_persona(persona)
+            for persona in personas_iniciales:
+                servicio.agregar_persona(persona)
 
     @app.get("/personas")
     def obtener_personas():
@@ -70,6 +71,7 @@ def crear_app(servicio=None):
         try:
             persona = Persona(datos["dni"], datos["nombre"])
             servicio.agregar_persona(persona)
+
         except (TypeError, ValueError) as error:
             return jsonify({"error": str(error)}), 400
 
@@ -91,6 +93,7 @@ def crear_app(servicio=None):
         try:
             persona = Persona(dni, datos["nombre"])
             servicio.modificar_persona(dni, persona)
+
         except (TypeError, ValueError) as error:
             if "No existe" in str(error):
                 return jsonify({"error": str(error)}), 404
