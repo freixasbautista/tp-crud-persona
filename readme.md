@@ -6,8 +6,9 @@ PRACTICO/
 │   │   └── persona.py
 │   ├── services/
 │   │   └── persona_service.py
-│   └── repository/
-│       └── persona_repository.py
+│   ├── repository/
+│   │   └── persona_repository.py
+│   └── personas.db
 │
 ├── frontend/
 │   ├── src/
@@ -23,28 +24,40 @@ flowchart TD
     Usuario["Usuario"]
 
     subgraph Proyecto["PRACTICO"]
-        API["backend/api.py"]
-
-        subgraph Services["services/"]
-            Service["persona_service.py<br/>PersonaService"]
+        subgraph Frontend["frontend/"]
+            UI["React + TypeScript"]
+            Router["router.tsx<br/>TanStack Router"]
         end
 
-        subgraph Repository["repository/"]
-            Repo["persona_repository.py<br/>PersonaRepository"]
-        end
+        subgraph Backend["backend/"]
+            API["api.py<br/>Flask REST API"]
 
-        subgraph Models["models/"]
-            Model["persona.py<br/>Persona"]
+            subgraph Services["services/"]
+                Service["persona_service.py<br/>PersonaService"]
+            end
+
+            subgraph Repository["repository/"]
+                Repo["persona_repository.py<br/>PersonaRepository"]
+            end
+
+            subgraph Models["models/"]
+                Model["persona.py<br/>Persona"]
+            end
+
+            DB[("personas.db<br/>SQLite")]
         end
 
         README["readme.md"]
     end
 
-    Usuario -->|"HTTP"| API
+    Usuario --> UI
+    UI --- Router
+    UI -->|"HTTP / JSON"| API
     API -->|"solicita operaciones"| Service
-    Service -->|"reglas de negocio"| Repo
-    Repo -->|"guarda / busca / modifica / elimina"| Model
+    Service -->|"aplica reglas de negocio"| Model
+    Service -->|"solicita operaciones CRUD"| Repo
+    Repo -->|"guarda / busca / modifica / elimina"| DB
     Model -->|"valida datos"| Model
 
-    API -->|"JSON"| Usuario
+    API -->|"respuestas JSON"| UI
 ```
